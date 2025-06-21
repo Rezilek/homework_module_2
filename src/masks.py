@@ -1,29 +1,28 @@
-# Объявление функции
 def get_mask_card_number(card_number: int) -> str:
     """
     Возвращает замаскированную версию номера кредитной карты в формате XXXX XX** **** XXXX.
-
-    Параметры:
-    card_number (int): Номер кредитной карты в виде целого числа.
-
-    Возврат:
-    str: Замаскированный номер карты.
+    Выбрасывает ValueError, если номер карты слишком короткий.
     """
-    card_string = str(card_number)  # Преобразуем номер карты в строку
+    if not isinstance(card_number, int):
+        raise TypeError("Номер карты должен быть целым числом")
+
+    card_string = str(card_number)
+    if len(card_string) < 16:
+        raise ValueError("Номер карты должен содержать минимум 16 цифр")
+
     return f"{card_string[:4]} {card_string[4:6]}** **** {card_string[-4:]}"
-    # Маскировка средних цифр при отображении первых 6 и последних 4 цифр
 
 
 def get_mask_account(account_number: int) -> str:
     """
     Возвращает замаскированную версию номера счета в формате **XXXX.
-
-    Параметры:
-    account_number (int): Номер счета в виде целого числа.
-
-    Возврат:
-    str: Замаскированный номер счета.
+    Выбрасывает ValueError, если номер счёта слишком короткий.
     """
-    account_string = str(account_number)  # Преобразуем номер счета в строку
+    if not isinstance(account_number, int):
+        raise TypeError("Номер счёта должен быть целым числом")
+
+    account_string = str(account_number)
+    if len(account_string) < 4:
+        raise ValueError("Номер счёта должен содержать минимум 4 цифры")
+
     return f"**{account_string[-4:]}"
-    # Маскировка начала с отображением последних 4 цифр

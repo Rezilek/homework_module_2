@@ -22,8 +22,15 @@ src/
 git clone https://github.com/ваш-username/банковские-утилиты.git
 cd банковские-утилиты
 ```
-
-2. Убедитесь, что у вас установлен Python 3.6 или выше:
+2. Установить poetry
+```
+poetry install
+```
+3. Активировать виртуальное окружение
+```
+poetry shell
+```
+4. Убедитесь, что у вас установлен Python 3.6 или выше:
 ```bash
 python --version
 ```
