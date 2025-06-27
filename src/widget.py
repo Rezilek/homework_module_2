@@ -1,6 +1,8 @@
 # src/widget.py
-from src.masks import get_mask_account, get_mask_card_number
 from datetime import datetime
+
+from src.masks import get_mask_account, get_mask_card_number
+
 
 def mask_account_card(input_str: str) -> str:
     """Маскирует номер карты или счета в зависимости от типа, указанного при вводе"""
@@ -42,6 +44,7 @@ def get_date(date_string: str) -> str:
         return date.strftime("%d.%m.%Y")
     except ValueError as e:
         raise ValueError(f"Неверный формат даты: {e}")
+
 
 if __name__ == "__main__":
     print(mask_account_card("Visa Platinum 7000792289606361"))  # Проверка маскировки карты
