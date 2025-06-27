@@ -14,12 +14,14 @@
 project/
 ├── src/
 │   ├── __init__.py
+|   |__ generators.py
 │   ├── masks.py        # Функции маскировки
 │   ├── processing.py   # Обработка транзакций
 │   └── widget.py       # Вспомогательные функции
 ├── tests/
 │   ├── __init__.py
-│   └── test_modul.py   # Все тесты
+│   └── test_generators.py # Новые тесты 
+|   |__ test_modul.py      # Все тесты 
 ├── requirements.txt
 └── README.md
 ```
@@ -43,7 +45,7 @@ project/
    ```
    poetry shell
    ```
-4. Убедитесь, что у вас установлен Python 3.6 или выше:
+4. Убедитесь, что у вас установлен Python 3.7 или выше:
    ```bash
    python --version
    ```
@@ -143,6 +145,69 @@ print(filter_by_state(transactions))  # Фильтрация по EXECUTED
 print(sort_by_date(transactions))    # Сортировка по дате (по убыванию)
 ```
 
+### Модуль generators.py
+
+#### Фильтрация транзакций
+
+1. `filter_by_currency(transactions: List[Dict], currency: str) -> Iterator[Dict]`
+Фильтрует транзакции по заданной валюте
+
+**Тесты:**
+- Корректная фильтрация по валюте USD/RUB
+- Обработка пустого списка транзакций
+- Обработка отсутствия заданной валюты
+- Проверка типа возвращаемого значения (Iterator)
+
+#### Получение описаний
+
+2. `transaction_descriptions(transactions: List[Dict]) -> Iterator[str]`
+Извлекает описания транзакций
+
+**Тесты:**
+- Корректное извлечение описаний
+- Обработка транзакций без поля description
+- Обработка пустого списка транзакций
+- Проверка порядка вывода описаний
+
+#### Генерация номеров карт
+
+3. `card_number_generator(start: int, end: int) -> Iterator[str]`
+Генерирует номера карт в формате `XXXX XXXX XXXX XXXX`
+
+**Тесты:**
+- Корректность генерации в диапазоне 1-5
+- Проверка формата вывода (4 группы по 4 цифры)
+- Обработка граничных значений:
+  - 0000 0000 0000 0001
+  - 9999 9999 9999 9999
+- Проверка валидации входных данных:
+  - start > end (ValueError)
+  - отрицательные значения (ValueError)
+
+## Примеры использования
+
+```python
+from generators import filter_by_currency, transaction_descriptions, card_number_generator
+
+# Фильтрация транзакций
+usd_transactions = filter_by_currency(transactions, "USD")
+print(next(usd_transactions))
+
+# Получение описаний
+for desc in transaction_descriptions(transactions):
+    print(desc)
+
+# Генерация номеров карт
+for card in card_number_generator(1, 5):
+    print(card)
+```
+
+## Тестирование
+
+Запуск всех тестов:
+```bash
+pytest -v tests/test_generators.py --cov=generators --cov-report=term-missing
+```
 ## Использование
 
 ### Маскировка данных
@@ -210,6 +275,7 @@ flake8 src/ tests/
 - `src/masks.py` - маскировка номеров
 - `src/widget.py` - основные функции интерфейса
 - `src/processing.py` - обработка транзакций
+- `src/generators.py` - генерация номеров карт
 
 ## Лицензия
 
