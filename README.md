@@ -14,12 +14,14 @@
 project/
 ├── src/
 │   ├── __init__.py
+|   ├── decorators.py   # Основной модуль с декоратором
 |   |__ generators.py
 │   ├── masks.py        # Функции маскировки
 │   ├── processing.py   # Обработка транзакций
 │   └── widget.py       # Вспомогательные функции
 ├── tests/
 │   ├── __init__.py
+|   ├── test_decorators.py # Тесты с аннотациями типов
 │   └── test_generators.py # Новые тесты 
 |   |__ test_modul.py      # Все тесты 
 ├── requirements.txt
@@ -30,29 +32,36 @@ project/
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/Rezilek/git@github.com:Rezilek/homework_10_2.git
-   cd git@github.com:Rezilek/homework_10_2.git
+   git clone https://github.com/Rezilek/git@github.com:Rezilek/homework_module_2.git
+   cd git@github.com:Rezilek/homework_module_2.git
    ```
 2. Установите зависимости:
    ```bash
    pip install -r requirements.txt
    ```
-2. Установить poetry
+3. Установить poetry
    ```
    poetry install
    ```
-3. Активировать виртуальное окружение
+4. Требования к окружению
+
+ Активировать виртуальное окружение
    ```
    poetry shell
    ```
-4. Убедитесь, что у вас установлен Python 3.7 или выше:
+Зависимости:
+  - pytest
+  - pytest-cov
+  - mypy (для проверки типов)
+
+5. Убедитесь, что у вас установлен Python 3.8 или выше:
    ```bash
    python --version
    ```
 
 ## Функционал
 
-### masks.py
+### Module masks.py
 
 1. `get_mask_card_number(card_number: int) -> str`  
    Возвращает замаскированный номер кредитной карты в формате `XXXX XX** **** XXXX`.
@@ -81,7 +90,7 @@ project/
   - Слишком короткие номера
   - Не строковые данные
 
-### widget.py
+### Module widget.py
 
 1. `mask_account_card(input_str: str) -> str`
 Автоматически определяет тип (карта/счет) и применяет соответствующую маскировку
@@ -103,10 +112,10 @@ project/
   - Неправильного формата
   - Не строковых данных
 
-### processing.py
+### Module processing.py
 
 1. `filter_by_state(transactions: List[Dict], state: str = "EXECUTED") -> List[Dict]`
-Фильтрует транзакции по состоянию (EXECUTED, CANCELED, PENDING)
+# Фильтрует транзакции по состоянию (EXECUTED, CANCELED, PENDING)
 
 **Тесты:**
 - Фильтрация по каждому состоянию
@@ -123,7 +132,7 @@ project/
 - Обработка транзакций без поля date
 - Обработка пустого списка
 
-## Примеры использования
+#### Примеры использования
 
 ```python
 # Пример работы с маскировкой
@@ -145,7 +154,7 @@ print(filter_by_state(transactions))  # Фильтрация по EXECUTED
 print(sort_by_date(transactions))    # Сортировка по дате (по убыванию)
 ```
 
-### Модуль generators.py
+### Module generators.py
 
 #### Фильтрация транзакций
 
@@ -184,10 +193,10 @@ print(sort_by_date(transactions))    # Сортировка по дате (по 
   - start > end (ValueError)
   - отрицательные значения (ValueError)
 
-## Примеры использования
+#### Примеры использования
 
 ```python
-from generators import filter_by_currency, transaction_descriptions, card_number_generator
+from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
 
 # Фильтрация транзакций
 usd_transactions = filter_by_currency(transactions, "USD")
@@ -202,7 +211,7 @@ for card in card_number_generator(1, 5):
     print(card)
 ```
 
-## Тестирование
+### Тестирование
 
 Запуск всех тестов:
 ```bash
@@ -240,6 +249,108 @@ executed = filter_by_state(transactions)
 # Сортировка по дате (новые сначала)
 sorted_trans = sort_by_date(transactions)
 ```
+
+### Module decorators
+
+Декоратор `log` предоставляет гибкую систему логирования выполнения функций с возможностью вывода:
+- В консоль (по умолчанию)
+- В указанный файл (при задании параметра `filename`)
+
+#### Декоратор логирования
+`log(filename: Optional[str] = None) -> Callable`
+Логирует выполнение функций с возможностью вывода в файл или консоль
+
+**Тесты:**
+- Логирование успешного выполнения:
+  - В консоль (без filename)
+  - В файл (с указанием filename)
+  - Проверка формата сообщения (временная метка, имя функции)
+  
+- Логирование ошибок:
+  - Запись типа исключения
+  - Фиксация входных параметров
+  - Проверка проброса исключения дальше
+  
+- Особые случаи:
+  - Функции без аргументов
+  - Функции с именованными аргументами
+  - Функции возвращающие None
+  - Функции с комплексными аргументами (словари, списки)
+  
+- Метаданные:
+  - Сохранение __name__ оригинальной функции
+  - Сохранение __doc__ оригинальной функции
+  - Проверка типа возвращаемого значения (Callable)
+
+#### Примеры использования
+
+```python
+from src.decorators import log
+
+- "Логирование в консоль"
+@log()
+def add(a: int, b: int) -> int:
+    return a + b
+
+add(1, 2)
+
+- "Логирование в файл"
+@log(filename="operations.log")
+def divide(a: int, b: int) -> float:
+    return a / b
+
+divide(10, 2)
+divide(5, 0)  # Запишет ошибку
+
+- "Сложные аргументы"
+@log()
+def process(data: list[dict]) -> int:
+    return len(data)
+
+process([{"id": 1}, {"id": 2}])
+```
+
+### Тестирование
+
+Запуск тестов:
+```bash
+pytest -v tests/test_decorators.py --cov=decorators --cov-report=term-missing
+```
+
+**Покрытие тестами:**
+- Все основные сценарии использования
+- Граничные случаи:
+  - Пустые аргументы
+  - Некорректные filename
+  - Исключения разных типов
+- Проверка метаданных функций
+- 100% покрытие основного кода
+
+**Дополнительные проверки:**
+```bash
+mypy decorators.py  # Проверка типов
+flake8 decorators.py  # Проверка стиля
+```
+
+#### Структура логов
+
+Успешное выполнение:
+```
+[YYYY-MM-DD HH:MM:SS] function_name ok
+```
+
+Ошибка выполнения:
+```
+[YYYY-MM-DD HH:MM:SS] function_name error: ErrorType. Inputs: (args,), {kwargs}
+```
+
+Файловый вывод:
+- Создание файла при первом вызове
+- Дописывание в существующий файл
+- Кодировка UTF-8
+```
+
+
 ## Запуск тестов
 
 Для запуска всех тестов с проверкой покрытия:
@@ -276,6 +387,7 @@ flake8 src/ tests/
 - `src/widget.py` - основные функции интерфейса
 - `src/processing.py` - обработка транзакций
 - `src/generators.py` - генерация номеров карт
+- `src/decorators.py` - логирование выполнения функций
 
 ## Лицензия
 
@@ -289,4 +401,3 @@ Copyright (c) 2025 Rezilek
 Резиля Столярова 
 Email: rezilek5177@gmail.com  
 GitHub: [Rezilek](https://github.com/Rezilek)
-
