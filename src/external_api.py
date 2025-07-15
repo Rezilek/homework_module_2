@@ -15,37 +15,37 @@ def convert_transaction_amount(transaction: Dict) -> float:
     Конвертирует сумму транзакции в рубли.
 
     Args:
-        transaction: Словарь с данными о транзакции.
+        transaction: Словарь с данными о транзакции (должен содержать operationAmount)
 
     Returns:
-        Сумма транзакции в рублях (float).
+        Сумма транзакции в рублях (float)
 
     Raises:
-        ValueError: Если валюта транзакции не поддерживается.
-        ConnectionError: Если не удалось получить курс валют.
+        ValueError: Если валюта транзакции не поддерживается или данные некорректны
+        ConnectionError: Если не удалось получить курс валют
     """
     try:
-        amount = float(transaction["amount"])
+        # Получаем данные из правильной структуры
+        amount_data = transaction["operationAmount"]
+        amount = float(amount_data["amount"])
+        currency = amount_data["currency"]["code"]
+
+        if currency == "RUB":
+            return amount
+
+        if currency not in ("USD", "EUR"):
+            raise ValueError(f"Unsupported currency: {currency}")
+
+        try:
+            response = requests.get(
+                BASE_URL, params={"base": currency, "symbols": "RUB"}, headers={"apikey": API_KEY}, timeout=5
+            )
+            response.raise_for_status()
+            rate = response.json()["rates"]["RUB"]
+            return amount * rate
+
+        except (requests.RequestException, KeyError) as e:
+            raise ConnectionError(f"API request failed: {str(e)}")
+
     except (KeyError, ValueError) as e:
-        raise ValueError("Invalid transaction amount") from e
-
-    currency = transaction.get("currency")
-
-    if currency == "RUB":
-        return amount
-
-    if currency not in ("USD", "EUR"):
-        raise ValueError(f"Unsupported currency: {currency}")
-
-    try:
-        response = requests.get(
-            BASE_URL, params={"base": currency, "symbols": "RUB"}, headers={"apikey": API_KEY}, timeout=10
-        )
-        response.raise_for_status()
-        rates = response.json().get("rates", {})
-        rate = rates.get("RUB")
-        if rate is None:
-            raise ConnectionError("RUB rate not found in response")
-        return float(amount * rate)
-    except requests.RequestException as e:
-        raise ConnectionError("Failed to get exchange rate: {str(e)}") from e
+        raise ValueError(f"Invalid transaction data: {str(e)}")

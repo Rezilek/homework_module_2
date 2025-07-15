@@ -56,7 +56,11 @@ project/
    poetry shell
    cp .env.template .env
    ```
-
+     
+   Затем откройте `.env` и укажите ваш ключ от [Exchange Rates API](https://apilayer.com/marketplace/exchangerates_data-api):
+   ```ini
+   EXCHANGE_RATE_API_KEY=ваш_ключ_здесь
+   
 4. Убедитесь в наличии Python 3.8+:
    ```bash
    python --version
@@ -147,7 +151,41 @@ def transfer(amount: float, from_acc: str, to_acc: str) -> bool:
 transfer(1000.0, "Счет 1234", "Счет 5678")
 ```
 
+### Модуль external_api.py
+
+Конвертация валютных транзакций в рубли через внешний API:
+
+```python
+from src.external_api import convert_transaction_amount
+
+transaction = {
+    "operationAmount": {
+        "amount": "100",
+        "currency": {
+            "code": "USD"
+        }
+    }
+}
+
+# Конвертация USD → RUB по текущему курсу
+converted_amount = convert_transaction_amount(transaction)
+print(converted_amount)  # Пример: 7500.50 (100 USD * 75.005)
+```
+
+**Особенности:**
+- Поддерживает валюты: `USD`, `EUR`, `RUB`
+- Данные должны содержать поля:  
+  `operationAmount.amount` (число)  
+  `operationAmount.currency.code` (код валюты)
+- В случае ошибки возвращает `None` и пишет в лог
+- 
 ## Тестирование
+
+**Проверка конвертации валют:**
+- Корректное извлечение суммы и кода валюты из `operationAmount`
+- Обработка транзакций без нужных полей (`KeyError`)
+- Конвертация RUB → RUB (без вызова API)
+- Мокирование запросов к API в тестах
 
 Запуск всех тестов:
 ```bash
@@ -164,6 +202,10 @@ mypy src/ tests/
 - 100% для основных функций
 - Тестирование граничных случаев
 - Проверка обработки ошибок
+- - 100% coverage для `external_api.py`, включая:
+  - Обработку правильной структуры транзакции
+  - Ошибки подключения к API
+  - Некорректные коды валют
 
 ## Документация
 
