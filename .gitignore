@@ -201,5 +201,5 @@ cython_debug/
 *.env
 *.sqlite3
 .venv/
-
+logs/
 

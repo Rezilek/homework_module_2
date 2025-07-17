@@ -49,3 +49,10 @@ class TestReadJsonFile(TestCase):
     def test_read_nonexistent_file(self) -> None:
         result: List[Dict[str, Any]] = read_json_file("nonexistent_file.json")
         self.assertEqual(result, [])
+
+
+def test_read_json_file_logging(tmp_path, caplog):
+    # Тест файла, который не существует
+    result = read_json_file("non_existent.json")
+    assert result == []
+    assert "Файл не найден" in caplog.text
