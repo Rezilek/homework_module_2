@@ -223,3 +223,12 @@ def test_sort_stability() -> None:
     ]
     sorted_trans = sort_by_date(transactions)
     assert [t["id"] for t in sorted_trans] == [1, 2]  # Сохраняем исходный порядок
+
+
+def test_mask_card_number_logging(caplog):
+    with pytest.raises(ValueError):
+        get_mask_card_number(12345)  # Слишком короткий номер
+
+    assert "Номер карты должен содержать минимум 16 цифр" in caplog.text
+    assert "ERROR" in caplog.text
+
