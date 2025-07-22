@@ -1,10 +1,11 @@
 import json
 import os
 from typing import Any, Dict, List
+
 from src.log_config import setup_logger
 
 # Настройка логера для модуля utils
-logger = setup_logger('utils_module', 'utils.log')
+logger = setup_logger("utils_module", "utils.log")
 
 
 def read_json_file(file_path: str) -> List[Dict[str, Any]]:
@@ -17,7 +18,7 @@ def read_json_file(file_path: str) -> List[Dict[str, Any]]:
             logger.error(error_msg)
             raise FileNotFoundError(error_msg)
 
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             data = json.load(file)
 
         if not isinstance(data, list):
@@ -38,15 +39,15 @@ def read_json_file(file_path: str) -> List[Dict[str, Any]]:
         return []
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Демонстрация работы с логированием
-    import tempfile
     import os
+    import tempfile
 
     print("\nДемонстрация работы utils.py:")
 
     # Создание тестового JSON файла
-    with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', suffix='.json', delete=False) as tmp:
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".json", delete=False) as tmp:
         tmp.write('[{"id": 1}, {"id": 2}]')
         test_file = tmp.name
 
@@ -57,15 +58,15 @@ if __name__ == '__main__':
     print("Чтение отсутствующего файла:", read_json_file("non_existent.json"))
 
     # Создание файла с невалидным JSON
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tmp:
-        tmp.write('{invalid json}')
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
+        tmp.write("{invalid json}")
         invalid_json = tmp.name
 
     # Чтение битого JSON
     print("Чтение битого JSON:", read_json_file(invalid_json))
 
     # Создание файла с не-списком
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tmp:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
         tmp.write('{"key": "value"}')
         not_list = tmp.name
 

@@ -1,7 +1,7 @@
 from src.log_config import setup_logger
 
 # Настройка логера для модуля masks
-logger = setup_logger('masks_module', 'masks.log')
+logger = setup_logger("masks_module", "masks.log")
 
 
 def get_mask_card_number(card_number: int) -> str:
@@ -42,7 +42,7 @@ def get_mask_account(account_number: int) -> str:
         raise
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Демонстрация работы функций с логированием
     print("Демонстрация работы masks.py:")
     try:
