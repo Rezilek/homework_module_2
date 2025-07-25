@@ -1,4 +1,6 @@
-from typing import Dict, List  # Импортирование необходимых типов
+import re
+from collections import Counter
+from typing import Any, Dict, List
 
 
 def filter_by_state(transactions: List[Dict], state: str = "EXECUTED") -> List[Dict]:
@@ -27,6 +29,39 @@ def sort_by_date(transactions: List[Dict], reverse: bool = True) -> List[Dict]:
     List[Dict]: отсортированный список транзакций.
     """
     return sorted(transactions, key=lambda x: x["date"], reverse=reverse)
+
+
+def process_bank_search(data: List[Dict[str, Any]], search: str) -> List[Dict[str, Any]]:
+    """
+    Ищет транзакции, в описании которых встречается заданная строка (с использованием регулярных выражений).
+
+    :param data: Список транзакций (словарей)
+    :param search: Строка для поиска
+    :return: Отфильтрованный список транзакций
+    """
+    pattern = re.compile(search, re.IGNORECASE)
+    result = []
+    for transaction in data:
+        description = transaction.get("description", "")
+        if description and pattern.search(description):
+            result.append(transaction)
+    return result
+
+
+def process_bank_operations(data: List[Dict[str, Any]], categories: List[str]) -> Dict[str, int]:
+    """
+    Подсчитывает количество операций в указанных категориях.
+
+    :param data: Список транзакций (словарей)
+    :param categories: Список категорий для подсчета
+    :return: Словарь с количеством операций по категориям
+    """
+    descriptions = []
+    for t in data:
+        desc = t.get("description")
+        if desc is not None and desc in categories:
+            descriptions.append(desc)
+    return dict(Counter(descriptions))
 
 
 # Пример использования
