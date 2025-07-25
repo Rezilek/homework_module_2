@@ -17,6 +17,7 @@ project/
 ├── src/
 │   ├── __init__.py
 │   ├── decorators.py       # Модуль логирования операций
+│   ├── file_reader.py      # Новый модуль для CSV/Excel
 │   ├── generators.py       # Генераторы тестовых данных
 │   ├── masks.py            # Функции маскировки данных
 │   ├── processing.py       # Обработка транзакций
@@ -28,16 +29,23 @@ project/
 │   ├── __init__.py
 │   ├── test_decorators.py
 │   ├── test_external_api.py
+│   ├── test_file_reader.py # Тесты для нового модуля
 │   ├── test_generators.py
 │   ├── test_modul.py       # Тесты основных функций
 │   ├── test_utils.py       # Тесты утилит
 │   └── test_logging.py     # Тесты логирования
 ├── data/
 │   └── operations.json     # Пример данных транзакций
+│   ├── transactions.csv    # Пример CSV файла
+│   └── transactions.xlsx   # Пример Excel файла
 ├── logs/                   # Директория для логов
+│   ├── file_reader.log       # Логи нового модуля
+│   ├── masks.log
+│   ├── utils.log
 ├── .env.template           # Шаблон для переменных окружения
 ├── requirements.txt        # Зависимости Python
 ├── pyproject.toml          # Конфигурация проекта
+├── setup.py                  # Для корректных импортов
 └── README.md
 ```
 
@@ -228,6 +236,26 @@ logger.error("Ошибка обработки данных")
 - Гибкая настройка уровня логирования
 - UTF-8 кодировка логов
 
+### Модуль file_reader.py
+
+Поддержка чтения транзакций из CSV и Excel файлов.
+
+#### Функции:
+- `read_csv(file_path: str) -> list[dict]`: Читает CSV файл и возвращает список словарей.
+- `read_excel(file_path: str) -> list[dict]`: Читает Excel файл (первый лист) и возвращает список словарей.
+
+Пример использования:
+```python
+from src.file_reader import read_csv, read_excel
+
+csv_transactions = read_csv("data/transactions.csv")
+excel_transactions = read_excel("data/transactions.xlsx")
+```
+
+**Особенности:**
+- Автоматическое преобразование NaN в None
+- Поддержка разных кодировок CSV
+- Гибкий выбор листов в Excel
 ## Тестирование
 
 **Комплексное тестирование системы:**
