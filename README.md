@@ -25,7 +25,8 @@ project/
 │   ├── widget.py           # Основные функции интерфейса
 │   ├── external_api.py     # Работа с внешними API
 │   └── log_config.py       # Настройка системы логирования
-├── tests/
+├   └── main.py             # 
+── tests/
 │   ├── __init__.py
 │   ├── test_decorators.py
 │   ├── test_external_api.py
@@ -141,6 +142,11 @@ print(get_date("2024-03-11T02:26:18.671407"))  # 11.03.2024
 
 ### Модуль processing.py
 
+- `filter_by_state()` - фильтрация транзакций по статусу
+- `sort_by_date()` - сортировка транзакций по дате
+- `process_bank_search()` - поиск транзакций по описанию (регулярные выражения)
+- `process_bank_operations()` - подсчет операций по категориям
+
 Обработка транзакций:
 
 ```python
@@ -157,6 +163,15 @@ executed = filter_by_state(transactions, "EXECUTED")
 # Сортировка по дате
 sorted_trans = sort_by_date(transactions, reverse=True)
 ```
+### Модуль main.py
+
+Реализует основной пользовательский интерфейс:
+- Выбор источника данных (JSON/CSV/XLSX)
+- Фильтрация по статусу операции
+- Сортировка по дате
+- Фильтрация по валюте
+- Поиск по ключевым словам
+- Форматированный вывод результатов
 
 ### Модуль generators.py
 
